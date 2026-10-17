@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Profesional English for IT</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --success: #10b981;
+            --error: #ef4444;
+            --easy: #059669;
+            --medium: #d97706;
+            --hard: #dc2626;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 750px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Screen Setup Styling */
+        .screen {
+            padding: 40px;
+        }
+
+        .header-title {
+            text-align: center;
+            margin-bottom: 8px;
+            color: var(--primary);
+            font-size: 26px;
+            font-weight: 700;
+        }
+
+        .header-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .setup-group {
+            margin-bottom: 24px;
+        }
+
+        .setup-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 15px;
+            color: var(--text-main);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+        }
+
+        .setup-btn {
+            background: #f1f5f9;
+            border: 2px solid var(--border-color);
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .setup-btn:hover {
+            border-color: var(--primary);
+            background: #eef2ff;
+        }
+
+        .setup-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .start-btn {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.2s;
+        }
+
+        .start-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        /* Quiz Screen Styling */
+        #quiz-screen {
+            display: none;
+        }
+
+        .quiz-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .quiz-top-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge-easy { background-color: var(--easy); }
+        .badge-medium { background-color: var(--medium); }
+        .badge-hard { background-color: var(--hard); }
+
+        .exit-btn {
+            background: #fee2e2;
+            color: var(--error);
+            border: 1px solid #fecaca;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .exit-btn:hover {
+            background: var(--error);
+            color: white;
+        }
+
+        .progress-text {
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .question-box {
+            font-size: 18px;
+            font-weight: 600;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: var(--text-main);
+        }
+
+        .choices-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .choice-item {
+            background: #f8fafc;
+            border: 2px solid var(--border-color);
+            padding: 14px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .choice-item:hover:not(.disabled) {
+            background: #eef2ff;
+            border-color: #a5b4fc;
+        }
+
+        .choice-item.selected {
+            background: #e0e7ff;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .choice-item.correct {
+            background: #d1fae5 !important;
+            border-color: var(--success) !important;
+            color: #065f46 !important;
+        }
+
+        .choice-item.incorrect {
+            background: #fee2e2 !important;
+            border-color: var(--error) !important;
+            color: #991b1b !important;
+        }
+
+        .choice-item.disabled {
+            cursor: default;
+        }
+
+        .feedback-box {
+            background: #f1f5f9;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            display: none;
+            border-left: 4px solid var(--primary);
+        }
+
+        .feedback-box.correct {
+            background: #ecfdf5;
+            border-left-color: var(--success);
+            color: #065f46;
+        }
+
+        .feedback-box.incorrect {
+            background: #fef2f2;
+            border-left-color: var(--error);
+            color: #991b1b;
+        }
+
+        .navigation-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 20px;
+        }
+
+        .nav-btn {
+            background: #e2e8f0;
+            color: var(--text-main);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: #cbd5e1;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .nav-btn.primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-btn.primary:hover:not(:disabled) {
+            background: var(--primary-hover);
+        }
+
+        /* Results Screen */
+        #results-screen {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .score-display {
+            font-size: 56px;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 20px 0;
+        }
+
+        .result-msg {
+            color: var(--text-muted);
+            font-size: 16px;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    
+    <!-- SETUP SCREEN -->
+    <div id="setup-screen" class="screen">
+        <h1 class="header-title">English for IT Quiz</h1>
+        <p class="header-subtitle">Uji pemahaman materi Unit 1 s.d. Unit 4 sesuai pilihan Anda</p>
+        
+        <div class="setup-group">
+            <label class="setup-label">Pilih Tingkat Kesulitan:</label>
+            <div class="options-grid" id="level-options">
+                <div class="setup-btn active" data-level="Mudah">Mudah</div>
+                <div class="setup-btn" data-level="Sedang">Sedang</div>
+                <div class="setup-btn" data-level="Susah">Susah</div>
+                <div class="setup-btn" data-level="Campur">Campur (Semua)</div>
+            </div>
+        </div>
+
+        <div class="setup-group">
+            <label class="setup-label">Jumlah Soal:</label>
+            <div class="options-grid" id="count-options">
+                <div class="setup-btn active" data-count="20">20 Soal</div>
+                <div class="setup-btn" data-count="50">50 Soal</div>
+                <div class="setup-btn" data-count="70">70 Soal</div>
+                <div class="setup-btn" data-count="100">100 Soal</div>
+            </div>
+        </div>
+
+        <button class="start-btn" onclick="startQuiz()">Mulai Kuis Sekarang</button>
+    </div>
+
+    <!-- QUIZ SCREEN -->
+    <div id="quiz-screen" class="screen">
+        <div class="quiz-top-bar">
+            <div class="quiz-top-left">
+                <span id="level-badge" class="badge badge-easy">Mudah</span>
+                <button class="exit-btn" onclick="confirmExit()">Keluar Kuis</button>
+            </div>
+            <span id="progress-text" class="progress-text">Soal 1 dari 20</span>
+        </div>
+
+        <div id="question-text" class="question-box">Memuat pertanyaan...</div>
+        
+        <ul id="choices-list" class="choices-list"></ul>
+
+        <div id="feedback-box" class="feedback-box"></div>
+
+        <div class="navigation-footer">
+            <button id="prev-btn" class="nav-btn" onclick="prevQuestion()" disabled>Sebelumnya</button>
+            <button id="next-btn" class="nav-btn primary" onclick="nextQuestion()" disabled>Selanjutnya</button>
+        </div>
+    </div>
+
+    <!-- RESULTS SCREEN -->
+    <div id="results-screen" class="screen">
+        <h1 class="header-title">Hasil Kuis Anda</h1>
+        <p class="header-subtitle">Evaluasi latihan soal English for IT</p>
+        
+        <div class="score-display" id="final-score">0 / 0</div>
+        <p id="result-msg" class="result-msg">Kerja bagus!</p>
+
+        <button class="start-btn" onclick="resetSetup()">Konfigurasi Ulang / Menu Utama</button>
+    </div>
+
+</div>
+
+<script>
+    // BANK SOAL LENGKAP & BERVARIATIF (Unit 1 - Unit 4)
+    const masterBank = [
+        // --- KATEGORI MUDAH ---
+        { level: "Mudah", q: "She ... (download) the new driver yesterday.", options: ["has downloaded", "downloaded", "is downloading", "download"], answer: 1, rationale: "Terdapat penanda waktu 'yesterday' yang mewajibkan bentuk Past Simple ('downloaded')." },
+        { level: "Mudah", q: "... you ever lost data due to a virus?", options: ["Did", "Have", "Do", "Has"], answer: 1, rationale: "Menanyakan pengalaman hidup menggunakan struktur Present Perfect 'Have you ever...'." },
+        { level: "Mudah", q: "I ... my RAM twice this year.", options: ["replaced", "have replaced", "replace", "was replacing"], answer: 1, rationale: "Aksi berulang dalam rentang waktu yang belum selesai ('this year') menggunakan Present Perfect." },
+        { level: "Mudah", q: "He ... the hard drive last Tuesday.", options: ["has replaced", "replaced", "replaces", "replacing"], answer: 1, rationale: "Keterangan waktu spesifik masa lalu 'last Tuesday' menggunakan Past Simple." },
+        { level: "Mudah", q: "We ... already installed the new operating system.", options: ["have", "did", "are", "were"], answer: 0, rationale: "'Already' digabungkan dengan V3 menunjukkan Present Perfect ('have')." },
+        { level: "Mudah", q: "... your computer crash yesterday?", options: ["Have", "Has", "Did", "Do"], answer: 2, rationale: "Menanyakan kejadian spesifik kemarin menggunakan kata bantu 'Did'." },
+        { level: "Mudah", q: "They ... the broken motherboard 3 days ago.", options: ["fix", "have fixed", "fixed", "are fixing"], answer: 2, rationale: "'3 days ago' adalah indikator kuat Past Simple ('fixed')." },
+        { level: "Mudah", q: "I can't find my file. Someone ... deleted it.", options: ["has", "did", "was", "had"], answer: 0, rationale: "Kejadian masa lalu yang efeknya dirasakan sekarang menggunakan Present Perfect." },
+        { level: "Mudah", q: "ROM ... startup instructions.", options: ["is used to hold", "holds", "is used for holding", "function of holding"], answer: 1, rationale: "Fakta umum hardware dinyatakan dalam Present Simple ('holds')." },
+        { level: "Mudah", q: "RAM ... temporary data processing.", options: ["is used to hold", "is used for storing", "hold", "used for store"], answer: 1, rationale: "Struktur 'is used for + V-ing' ('is used for storing') menyatakan fungsi." },
+        { level: "Mudah", q: "The function of a cooling fan ... CPU temperature down.", options: ["is to keep", "is keep", "keeps", "used to keep"], answer: 0, rationale: "Pola baku 'The function of [X] is to + Infinitive'." },
+        { level: "Mudah", q: "A graphic card ... rendering high-resolution 3D games.", options: ["is used for", "is used to", "holds", "function of"], answer: 0, rationale: "Diikuti gerund 'rendering', pasangannya adalah 'is used for'." },
+        { level: "Mudah", q: "The scanner ... the barcode (Active).", options: ["is read", "reads", "read", "reading"], answer: 1, rationale: "Kalimat aktif subjek tunggal 'The scanner' menggunakan 'reads'." },
+        { level: "Mudah", q: "The barcode ... by the scanner (Passive).", options: ["is read", "reads", "read", "are read"], answer: 0, rationale: "Kalimat pasif subjek tunggal 'The barcode' menggunakan 'is + V3' ('is read')." },
+        { level: "Mudah", q: "First, the receipt ...", options: ["print", "is printed", "printed", "prints"], answer: 1, rationale: "Proses tahapan menggunakan bentuk pasif 'is printed'." },
+        { level: "Mudah", q: "Next, the barcode ...", options: ["is scanned", "scan", "scanned", "scans"], answer: 0, rationale: "Urutan proses pasif menggunakan 'is scanned'." },
+        { level: "Mudah", q: "... laser and ink-jet printers produce hard copy output.", options: ["Unlike", "Both", "Whereas", "Like"], answer: 1, rationale: "Menyatakan dua subjek memiliki kesamaan sifat ('Both')." },
+        { level: "Mudah", q: "... conventional cameras, digital cameras have optical viewfinders.", options: ["Both", "Unlike", "Like", "Whereas"], answer: 2, rationale: "Menunjukkan kemiripan menggunakan 'Like'." },
+        { level: "Mudah", q: "Laser printers are fast, ... ink-jet printers are slower.", options: ["whereas", "like", "both", "unlike"], answer: 0, rationale: "Penghubung kontras antar dua klausa menggunakan 'whereas'." },
+        { level: "Mudah", q: "... digital cameras, film cameras require chemical processing.", options: ["Both", "Like", "Unlike", "Whereas"], answer: 2, rationale: "Menunjukkan perbedaan karakteristik menggunakan 'Unlike'." },
+        { level: "Mudah", q: "My brother ... bought a new graphic card recently.", options: ["has", "did", "was", "is"], answer: 0, rationale: "Keterangan waktu 'recently' menggunakan Present Perfect ('has bought')." },
+        { level: "Mudah", q: "What is the function of a power supply? It ... electricity to all components.", options: ["supplies", "is used to supplying", "is used for supply", "function of supply"], answer: 0, rationale: "Present Simple subjek tunggal 'It' menggunakan kata kerja berakhiran -s ('supplies')." },
+        { level: "Mudah", q: "Then, the item price ... on the screen.", options: ["displays", "is displayed", "display", "displayed"], answer: 1, rationale: "Harga ditampilkan oleh sistem (pasif: 'is displayed')." },
+        { level: "Mudah", q: "... wired mice and wireless mice allow users to navigate cursors.", options: ["Unlike", "Both", "Whereas", "Like"], answer: 1, rationale: "Menyebutkan kesamaan fungsi dua perangkat menggunakan 'Both'." },
+        { level: "Mudah", q: "... a desktop computer, a laptop has a built-in battery and screen.", options: ["Unlike", "Both", "Like", "Whereas"], answer: 0, rationale: "Menyoroti kontras fisik menggunakan 'Unlike'." },
+
+        // --- KATEGORI SEDANG ---
+        { level: "Sedang", q: "By the time we arrived, the system ... already crashed.", options: ["has", "had", "did", "was"], answer: 1, rationale: "Past Perfect ('had crashed') digunakan untuk kejadian sebelum titik waktu tertentu di masa lalu." },
+        { level: "Sedang", q: "How many times ... you update your antivirus this month?", options: ["did", "have", "do", "were"], answer: 1, rationale: "Periode waktu 'this month' yang masih berjalan menggunakan Present Perfect ('have')." },
+        { level: "Sedang", q: "The programmers ... testing the code before the server went down.", options: ["were", "have", "did", "are"], answer: 0, rationale: "Aksi sedang berlangsung di masa lampau ketika kejadian lain terjadi menggunakan Past Continuous ('were')." },
+        { level: "Sedang", q: "I ... my password, so I cannot log in right now.", options: ["forget", "forgot", "have forgotten", "had forgotten"], answer: 2, rationale: "Kejadian lampau yang efeknya dirasakan sekarang menggunakan Present Perfect ('have forgotten')." },
+        { level: "Sedang", q: "She was coding when her laptop battery ... out.", options: ["run", "ran", "has run", "is running"], answer: 1, rationale: "Kejadian singkat yang memotong aksi panjang menggunakan Past Simple ('ran')." },
+        { level: "Sedang", q: "We ... the software update yet.", options: ["haven't downloaded", "didn't download", "don't download", "aren't downloading"], answer: 0, rationale: "Penggunaan 'yet' di kalimat negatif memerlukan Present Perfect ('haven't downloaded')." },
+        { level: "Sedang", q: "While the IT team ... the network, a power outage occurred.", options: ["repaired", "were repairing", "repair", "have repaired"], answer: 1, rationale: "Aksi duratif yang sedang berlangsung ditandai 'While' menggunakan Past Continuous ('were repairing')." },
+        { level: "Sedang", q: "He ... working at this tech startup since 2023.", options: ["is", "has been", "was", "did"], answer: 1, rationale: "Durasi dari masa lalu hingga sekarang menggunakan bentuk Present Perfect ('has been')." },
+        { level: "Sedang", q: "An expansion card ... to upgrade computer capabilities.", options: ["is used", "uses", "used", "is using"], answer: 0, rationale: "Bentuk pasif umum untuk mendeskripsikan kegunaan komponen ('is used')." },
+        { level: "Sedang", q: "The primary purpose of a motherboard ... link all internal hardware parts together.", options: ["is to", "is for", "are to", "for"], answer: 0, rationale: "Pola fungsi tunggal menggunakan 'is to + infinitive'." },
+        { level: "Sedang", q: "Optical drives ... reading data from CDs and DVDs.", options: ["are used for", "is used to", "used for", "are use for"], answer: 0, rationale: "Subjek jamak 'Optical drives' dipadukan dengan 'are used for + V-ing'." },
+        { level: "Sedang", q: "Thermal paste ... fill microscopic gaps between the CPU and heat sink.", options: ["is used to", "is used for", "used", "uses"], answer: 0, rationale: "Menyatakan fungsi dengan to-infinitive menggunakan 'is used to'." },
+        { level: "Sedang", q: "Currently, user passwords ... with advanced encryption algorithms.", options: ["are protected", "protect", "protected", "is protecting"], answer: 0, rationale: "Subjek jamak 'user passwords' dalam bentuk pasif Present Simple menggunakan 'are protected'." },
+        { level: "Sedang", q: "After the scan finishes, temporary cache files ... automatically.", options: ["are deleted", "delete", "deleted", "deleting"], answer: 0, rationale: "Bentuk pasif jamak untuk file cache menggunakan 'are deleted'." },
+        { level: "Sedang", q: "The source code ... into machine language by the compiler.", options: ["is translated", "translates", "translate", "translating"], answer: 0, rationale: "Proses terjemahan kode dikerjakan compiler secara pasif ('is translated')." },
+        { level: "Sedang", q: "Cloud storage offers remote accessibility, ... local hard drives require physical presence.", options: ["whereas", "like", "both", "similar to"], answer: 0, rationale: "Menyatakan perbandingan kontras antar dua klausa menggunakan 'whereas'." },
+        { level: "Sedang", q: "MySQL and PostgreSQL are relational databases, ... MongoDB is a NoSQL database.", options: ["whereas", "unlike", "both", "as"], answer: 0, rationale: "Menghubungkan dua karakteristik database yang kontras ('whereas')." },
+        { level: "Sedang", q: "... Python, JavaScript supports asynchronous programming models.", options: ["Like", "Unlike", "Whereas", "Both"], answer: 0, rationale: "Menyatakan persamaan fitur bahasa pemrograman menggunakan 'Like'." },
+        { level: "Sedang", q: "Compiled languages execute faster, ... interpreted languages require runtime evaluation.", options: ["whereas", "like", "both", "unlike"], answer: 0, rationale: "Perbandingan kontras kinerja bahasa pemrograman menggunakan 'whereas'." },
+        { level: "Sedang", q: "... TCP, UDP does not guarantee packet delivery confirmation.", options: ["Unlike", "Like", "Both", "Whereas"], answer: 0, rationale: "Menyoroti perbedaan protokol jaringan menggunakan 'Unlike'." },
+        { level: "Sedang", q: "They ... the bug before the client reported it.", options: ["fixed", "have fixed", "had fixed", "were fixing"], answer: 2, rationale: "Aksi yang selesai lebih dulu sebelum aksi lain di masa lampau menggunakan Past Perfect." },
+        { level: "Sedang", q: "What ... the function of an uninterruptible power supply (UPS)?", options: ["is", "are", "do", "does"], answer: 0, rationale: "Subjek tunggal 'the function' menggunakan to be 'is'." },
+        { level: "Sedang", q: "Every morning, system diagnostic tests ... by the server.", options: ["are run", "run", "runs", "is run"], answer: 0, rationale: "Subjek jamak 'system diagnostic tests' menggunakan 'are run' dalam kalimat pasif." },
+        { level: "Sedang", q: "Linux and Windows operating systems manage system resources, ... they use different kernel architectures.", options: ["although", "whereas", "both", "unlike"], answer: 1, rationale: "Menyatakan kontras fungsionalitas arsitektur di tengah kalimat menggunakan 'whereas'." },
+        { level: "Sedang", q: "Front-end developers handle interface design, ... back-end developers manage databases.", options: ["whereas", "like", "both", "unlike"], answer: 0, rationale: "Perbandingan peran pekerjaan di bidang IT menggunakan 'whereas'." },
+
+        // --- KATEGORI SUSAH ---
+        { level: "Susah", q: "Hardly ... the firewall configuration when the intrusion alert triggered.", options: ["had I updated", "I had updated", "did I update", "have I updated"], answer: 0, rationale: "Inversi kalimat dengan 'Hardly' di awal kalimat diikuti Past Perfect ('had I updated')." },
+        { level: "Susah", q: "By next month, our engineering team ... migrated all legacy systems to cloud infrastructure.", options: ["will have", "has", "had", "would"], answer: 0, rationale: "Future Perfect ('will have migrated') untuk menyatakan aksi yang selesai sebelum titik waktu di masa depan." },
+        { level: "Susah", q: "Not once ... experienced such a critical kernel panic in production servers.", options: ["have we", "we have", "did we", "we did"], answer: 0, rationale: "Inversi negatif setelah frasa penekanan 'Not once' menggunakan 'have we'." },
+        { level: "Susah", q: "Had the administrator backed up the database, the data loss ... prevented.", options: ["would have been", "will be", "had been", "is"], answer: 0, rationale: "Conditional Type 3 bentuk inversi menggunakan pasif 'would have been prevented'." },
+        { level: "Susah", q: "Little ... that the newly installed package contained malicious dependency scripts.", options: ["did the developer know", "the developer knew", "the developer has known", "does developer know"], answer: 0, rationale: "Inversi dengan kata pembatas negatif 'Little' menggunakan Past Simple 'did the developer know'." },
+        { level: "Susah", q: "Only after running multiple diagnostic tests ... the root cause of the memory leak.", options: ["could the engineers identify", "the engineers could identify", "identified the engineers", "did identify engineers"], answer: 0, rationale: "Inversi setelah klausa pembatas 'Only after...' menggunakan modal inversion." },
+        { level: "Susah", q: "It is crucial that every access log ... securely archived before midnight.", options: ["be", "is", "was", "has been"], answer: 0, rationale: "Subjunctive mood setelah frasa keharusan menggunakan bare infinitive ('be')." },
+        { level: "Susah", q: "Scarcely ... the compilation process when a syntax exception halted the build.", options: ["had the compiler initiated", "the compiler initiated", "did the compiler initiate", "has the compiler initiated"], answer: 0, rationale: "Struktur inversi 'Scarcely had + subjek + V3' untuk kejadian beruntun di masa lalu." },
+        { level: "Susah", q: "The overarching objective of implementing a RAID 1 array ... mirror data across twin disks to ensure fault tolerance.", options: ["is to", "is for", "serves for", "functions to"], answer: 0, rationale: "Struktur kalimat formal kompleks menyatakan tujuan fungsi hardware menggunakan 'is to'." },
+        { level: "Susah", q: "Dedicated GPU architectures ... executing parallel floating-point calculations required in machine learning training.", options: ["are specialized in", "are used to", "function for", "aim to"], answer: 0, rationale: "Ungkapan tingkat lanjut untuk mendeskripsikan spesialisasi fungsi hardware ('are specialized in')." },
+        { level: "Susah", q: "Piezoelectric elements within modern mechanical keyboards ... tactile actuation feedback to the typist.", options: ["are engineered to provide", "is engineered providing", "engineered for provide", "function providing"], answer: 0, rationale: "Frasa pasif tingkat lanjut menyatakan rekayasa fungsi hardware ('are engineered to provide')." },
+        { level: "Susah", q: "Once encrypted packets ... through the decryption gateway, plaintext streams ... to the application layer.", options: ["are passed / are forwarded", "pass / forward", "are passing / forward", "passed / are forwarding"], answer: 0, rationale: "Rangkaian proses pasif tingkat lanjut dalam arsitektur jaringan." },
+        { level: "Susah", q: "Mandatory security audits ... annually to ensure compliance with international data protection standards.", options: ["are conducted", "conduct", "are conducting", "conducted"], answer: 0, rationale: "Kalimat pasif formal peninjauan berkala menggunakan 'are conducted'." },
+        { level: "Susah", q: "Should any vulnerability be detected during code review, immediate patches ... implemented.", options: ["must be", "must", "are", "were"], answer: 0, rationale: "Penggunaan modal pasif tingkat lanjut untuk instruksi wajib ('must be implemented')." },
+        { level: "Susah", q: "It is imperative that unauthorized root access requests ... immediately logged and blocked.", options: ["be", "are", "were", "have been"], answer: 0, rationale: "Subjunctive pasif formal setelah kata keharusan menggunakan 'be logged'." },
+        { level: "Susah", q: "Whereas monolithic architectures encapsulate all modules into a single codebase, microservices ... disparate loosely coupled deployable services.", options: ["comprise", "comprises", "comprising", "is comprised"], answer: 0, rationale: "Subjek jamak 'microservices' dalam Present Simple menggunakan 'comprise'." },
+        { level: "Susah", q: "In contrast to synchronous REST APIs which block client threads awaiting responses, asynchronous WebSockets ... bidirectional real-time data streaming.", options: ["facilitate", "facilitates", "facilitating", "is facilitating"], answer: 0, rationale: "Subjek jamak 'asynchronous WebSockets' menggunakan verba dasar 'facilitate'." },
+        { level: "Susah", q: "Dynamic typing languages offer rapid prototyping flexibility, ... statically typed counterparts enforce rigorous compile-time type safety.", options: ["whereas", "like", "both", "similar to"], answer: 0, rationale: "Perbandingan kontras mendalam dua paradigma pemrograman menggunakan 'whereas'." },
+        { level: "Susah", q: "Much like containerized virtual environments abstract underlying host operating systems, hypervisors ... hardware virtualization across multiple guest VMs.", options: ["orchestrate", "orchestrates", "orchestrating", "is orchestrating"], answer: 0, rationale: "Subjek jamak 'hypervisors' menggunakan kata kerja dasar 'orchestrate'." },
+        { level: "Susah", q: "Relational database management systems rely on rigid ACID compliance transactions, ... NoSQL data stores prioritize eventual consistency models.", options: ["whereas", "unlike", "both", "as"], answer: 0, rationale: "Perbandingan kontras konsep penyimpanan data tingkat lanjut menggunakan 'whereas'." },
+        { level: "Susah", q: "Never before ... such sophisticated phishing vectors targeting financial APIs.", options: ["have we witnessed", "we have witnessed", "did we witness", "we witnessed"], answer: 0, rationale: "Inversi penekanan 'Never before' menggunakan Present Perfect 'have we witnessed'." },
+        { level: "Susah", q: "The primary mechanism by which a cache memory accelerates processing ... temporarily retaining frequently accessed instructions.", options: ["involves", "is involve", "involving", "is to involving"], answer: 0, rationale: "Subjek klausa panjang menuntut kata kerja tunggal Present Simple ('involves')." },
+        { level: "Susah", q: "Upon completion of the database migration, checksum validations ... to guarantee data integrity.", options: ["are executed", "execute", "executing", "is executed"], answer: 0, rationale: "Subjek jamak 'checksum validations' dalam kalimat pasif menggunakan 'are executed'." },
+        { level: "Susah", q: "Edge computing architectures process computational workloads locally near data sources, ... cloud computing infrastructures centralize processing within massive hyperscale server farms.", options: ["whereas", "like", "both", "unlike"], answer: 0, rationale: "Kontras arsitektur komputasi tingkat lanjut menggunakan 'whereas'." },
+        { level: "Susah", q: "Whereas symmetric encryption utilizes a single shared secret key for both encryption and decryption operations, asymmetric cryptography ... a distinct public-private key pair.", options: ["employs", "employ", "employing", "is employed"], answer: 0, rationale: "Subjek tunggal 'asymmetric cryptography' dalam Present Simple menggunakan 'employs'." }
+    ];
+
+    let selectedLevel = "Mudah";
+    let selectedCount = 20;
+
+    let activeQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let userAnswers = {};
+    let isAnswerLocked = false;
+
+    // Inisialisasi Event Listener untuk Pilihan Menu Setup
+    document.querySelectorAll('#level-options .setup-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            document.querySelectorAll('#level-options .setup-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            selectedLevel = e.target.getAttribute('data-level');
+        });
+    });
+
+    document.querySelectorAll('#count-options .setup-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            document.querySelectorAll('#count-options .setup-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            selectedCount = parseInt(e.target.getAttribute('data-count'));
+        });
+    });
+
+    function startQuiz() {
+        let pool = masterBank;
+        if (selectedLevel !== "Campur") {
+            pool = masterBank.filter(item => item.level === selectedLevel);
+        }
+
+        pool.sort(() => Math.random() - 0.5);
+        activeQuestions = pool.slice(0, selectedCount);
+
+        if (activeQuestions.length === 0) {
+            alert("Maaf, soal untuk kategori ini belum mencukupi.");
+            return;
+        }
+
+        currentIndex = 0;
+        score = 0;
+        userAnswers = {};
+
+        document.getElementById('setup-screen').style.display = 'none';
+        document.getElementById('quiz-screen').style.display = 'block';
+        document.getElementById('results-screen').style.display = 'none';
+
+        loadQuestion();
+    }
+
+    function confirmExit() {
+        if (confirm("Apakah Anda yakin ingin keluar dari kuis? Progress saat ini akan dihitung dan ditampilkan sebagai hasil.")) {
+            showResults();
+        }
+    }
+
+    function loadQuestion() {
+        isAnswerLocked = false;
+        const q = activeQuestions[currentIndex];
+
+        const badge = document.getElementById('level-badge');
+        badge.innerText = q.level;
+        badge.className = "badge " + (q.level === "Mudah" ? "badge-easy" : q.level === "Sedang" ? "badge-medium" : "badge-hard");
+
+        document.getElementById('progress-text').innerText = `Soal ${currentIndex + 1} dari ${activeQuestions.length}`;
+        document.getElementById('question-text').innerText = `${currentIndex + 1}. ${q.q}`;
+
+        const choicesList = document.getElementById('choices-list');
+        choicesList.innerHTML = '';
+
+        const savedAnswer = userAnswers[currentIndex];
+
+        q.options.forEach((opt, idx) => {
+            const li = document.createElement('li');
+            li.className = 'choice-item';
+            li.innerText = opt;
+
+            if (savedAnswer !== undefined) {
+                isAnswerLocked = true;
+                li.classList.add('disabled');
+                if (idx === q.answer) {
+                    li.classList.add('correct');
+                }
+                if (idx === savedAnswer && savedAnswer !== q.answer) {
+                    li.classList.add('incorrect');
+                }
+            } else {
+                li.onclick = () => selectChoice(idx);
+            }
+
+            choicesList.appendChild(li);
+        });
+
+        const feedbackBox = document.getElementById('feedback-box');
+        if (savedAnswer !== undefined) {
+            feedbackBox.style.display = 'block';
+            if (savedAnswer === q.answer) {
+                feedbackBox.className = 'feedback-box correct';
+                feedbackBox.innerHTML = `<strong>Benar!</strong> ${q.rationale}`;
+            } else {
+                feedbackBox.className = 'feedback-box incorrect';
+                feedbackBox.innerHTML = `<strong>Kurang tepat.</strong> ${q.rationale}`;
+            }
+            document.getElementById('next-btn').disabled = false;
+        } else {
+            feedbackBox.style.display = 'none';
+            document.getElementById('next-btn').disabled = true;
+        }
+
+        document.getElementById('prev-btn').disabled = currentIndex === 0;
+        document.getElementById('next-btn').innerText = currentIndex === activeQuestions.length - 1 ? "Selesai" : "Selanjutnya";
+    }
+
+    function selectChoice(idx) {
+        if (isAnswerLocked) return;
+        isAnswerLocked = true;
+        userAnswers[currentIndex] = idx;
+
+        const q = activeQuestions[currentIndex];
+        const choices = document.getElementById('choices-list').children;
+
+        for (let i = 0; i < choices.length; i++) {
+            choices[i].classList.add('disabled');
+            if (i === q.answer) {
+                choices[i].classList.add('correct');
+            }
+            if (i === idx && idx !== q.answer) {
+                choices[i].classList.add('incorrect');
+            }
+        }
+
+        const feedbackBox = document.getElementById('feedback-box');
+        feedbackBox.style.display = 'block';
+        if (idx === q.answer) {
+            score++;
+            feedbackBox.className = 'feedback-box correct';
+            feedbackBox.innerHTML = `<strong>Benar!</strong> ${q.rationale}`;
+        } else {
+            feedbackBox.className = 'feedback-box incorrect';
+            feedbackBox.innerHTML = `<strong>Kurang tepat.</strong> ${q.rationale}`;
+        }
+
+        document.getElementById('next-btn').disabled = false;
+    }
+
+    function nextQuestion() {
+        if (currentIndex < activeQuestions.length - 1) {
+            currentIndex++;
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function prevQuestion() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            loadQuestion();
+        }
+    }
+
+    function showResults() {
+        document.getElementById('quiz-screen').style.display = 'none';
+        document.getElementById('results-screen').style.display = 'block';
+
+        const percentage = Math.round((score / activeQuestions.length) * 100);
+        document.getElementById('final-score').innerText = `${score} / ${activeQuestions.length} (${percentage}%)`;
+
+        let msg = "";
+        if (percentage >= 85) {
+            msg = "Luar biasa! Penguasaan grammar dan materi English for IT Anda sudah sangat luar biasa.";
+        } else if (percentage >= 70) {
+            msg = "Kerja bagus! Pemahaman Anda sudah baik, terus tingkatkan ketelitian pada struktur kalimat teknis.";
+        } else {
+            msg = "Tetap semangat! Anda dapat mencoba mengulang kembali kuis ini untuk mempertajam pemahaman materinya.";
+        }
+        document.getElementById('result-msg').innerText = msg;
+    }
+
+    function resetSetup() {
+        document.getElementById('setup-screen').style.display = 'block';
+        document.getElementById('results-screen').style.display = 'none';
+        document.getElementById('quiz-screen').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
